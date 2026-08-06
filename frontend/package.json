@@ -13,9 +13,12 @@
     "@tailwindcss/vite": "^4.3.3",
     "axios": "^1.19.0",
     "cors": "^2.8.6",
+    "install": "^0.13.0",
+    "npm": "^11.19.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
+    "remixicon": "^4.9.1",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

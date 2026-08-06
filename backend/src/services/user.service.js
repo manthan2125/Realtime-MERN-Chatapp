@@ -16,3 +16,11 @@ export const createUser = async ({email, password}) => {
 
     return user;
 }
+
+export const getAllUsers = async({userId}) => {  // returns all user except logged in user
+    const users = await userModel.find({
+        _id: { $ne : userId }
+    }) ;
+
+    return users;
+}

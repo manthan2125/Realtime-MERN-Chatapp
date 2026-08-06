@@ -17,6 +17,7 @@ export const createUserController = async(req, res) => {
         const user = await userService.createUser(req.body);
 
         const token = await user.generateJWT();
+        delete user._doc.password;
 
         res.cookie("token", token);
 
@@ -55,6 +56,8 @@ export const loginUserController = async(req, res) => {
         }
 
         const token = await user.generateJWT();
+
+        delete user._doc.password;
 
         res.cookie("token", token);
 

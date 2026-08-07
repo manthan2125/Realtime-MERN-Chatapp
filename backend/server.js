@@ -5,6 +5,8 @@ import app from "./app.js";
 import connectToDB from "./src/db/db.js";
 import {Server} from 'socket.io'
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose"
+import projectModel from "./src/models/project.model.js";
 
 
 connectToDB()
@@ -19,11 +21,18 @@ const io = new Server(server, {
     }
 });
 
-io.use((socket, next) => {   // socket io ke through ek authenticate user hi connect kar paye
+io.use( async (socket, next) => {   // socket io ke through ek authenticate user hi connect kar paye
 
     try{
 
         const token = socket.handshake.auth?.token || socket.handshake.headers.authorization?.split(" ")[1];
+        const projectId = socket.handshake.query.projectId;  
+
+        if(!mongoose.Types.ObjectId.isValid(projectId)){
+            return next(new Error("Invalid projectId"));
+        }
+
+        socket.project = await projectModel.findById(projectId);
 
         if(!token){
             return next(new Error("Authentication Error"));
@@ -49,6 +58,15 @@ io.use((socket, next) => {   // socket io ke through ek authenticate user hi con
 
 io.on('connection', socket => {
     console.log("a user connected");
+
+    socket.join(socket.project._id);
+
+    socket.on("project-message", data => {
+
+        console.log(data)
+
+        socket.broadcast.to(socket.project._id).emit("project-message", data)
+    })
     
   socket.on('event', data => { /* … */ });
   socket.on('disconnect', () => { /* … */ });

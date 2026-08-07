@@ -1,7 +1,9 @@
-import React,{ useState, useEffect } from 'react'
+import React,{ useState, useEffect, useContext } from 'react'
 import { useLocation } from 'react-router-dom';
 import axios from "../config/axios.js"
 import { initializeSocket, receiveMessage, sendMessage } from "../config/socket.js"
+import { UserContext } from '../context/user.context.jsx';
+
 
 const Project = () => {
 
@@ -12,7 +14,9 @@ const Project = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [ selectedUserId, setSelectedUserId ] = useState(new Set())  // A Set is a JavaScript object that stores unique values only.
     const [users, setUsers] = useState([])  // users array is an array of objects of all users except logged in user
-    const [project, setProject] = useState(location.state.project)   // location.state.project -> will hold an object of clicked project on HOME page
+    const [project, setProject] = useState(location.state.project)   // location.state.project -> will hold clicked project in on HOME page in the form of object 
+    const [message, setMessage] = useState('')
+    const { user } = useContext(UserContext);
 
 
     const handleUserClick = (id) => {
@@ -28,9 +32,37 @@ const Project = () => {
         });
     }
 
+    function addCollaborators() {
+
+        axios.put("/projects/add-user", {
+            projectId: location.state.project._id,
+            users: Array.from(selectedUserId)
+        }).then(res => {
+            // console.log(res.data)
+            setIsModalOpen(false)
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
+    // console.log(users)
+
+    function send() {
+        sendMessage("project-message", {
+            message,
+            sender: user._id
+        })
+
+        setMessage("");
+    }
+
     useEffect(() => {
 
-        initializeSocket();
+        initializeSocket(project._id);
+
+        receiveMessage("project-message", data => {
+            console.log(data );
+        });
 
 
 
@@ -47,22 +79,6 @@ const Project = () => {
             console.log(err);
         })
     }, []);
-
-
-    function addCollaborators() {
-
-        axios.put("/projects/add-user", {
-            projectId: location.state.project._id,
-            users: Array.from(selectedUserId)
-        }).then(res => {
-            // console.log(res.data)
-            setIsModalOpen(false)
-        }).catch(err => {
-            console.log(err)
-        })
-    }
-
-    // console.log(users)
 
   return (
     <main
@@ -98,11 +114,16 @@ const Project = () => {
                         <p className='text-sm'>Lorem ipsum dolor sit amet.</p>
                     </div>
                 </div>
+                
                 <div className="input-field w-full flex bg-slate-100">
                     <input
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                     className='p-2 px-4 border-none outline-none grow'
                     type="text" placeholder='Enter message' />
-                    <button className='px-5 bg-slate-950 text-white'><i className="ri-send-plane-fill"></i></button>
+                    <button 
+                    onClick={send}
+                    className='px-5 cursor-pointer bg-slate-950 text-white'><i className="ri-send-plane-fill"></i></button>
                 </div>
             </div>  
 

@@ -1,7 +1,7 @@
 import React,{ useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom';
 import axios from "../config/axios.js"
-
+import { initializeSocket, receiveMessage, sendMessage } from "../config/socket.js"
 
 const Project = () => {
 
@@ -29,13 +29,16 @@ const Project = () => {
     }
 
     useEffect(() => {
+
+        initializeSocket();
+
+
+
         axios.get(`/projects/get-project/${location.state.project._id}`)
         .then(res => {
             // console.log("project with usser data", res.data.project);    // this will get that specific project with populated user
             setProject(res.data.project)
         })
-
-
 
         //  iss res.data.users ke andar wo sare user honge except logged in user
         axios.get("/users/all").then( res => {
@@ -52,7 +55,7 @@ const Project = () => {
             projectId: location.state.project._id,
             users: Array.from(selectedUserId)
         }).then(res => {
-            console.log(res.data)
+            // console.log(res.data)
             setIsModalOpen(false)
         }).catch(err => {
             console.log(err)
@@ -117,7 +120,7 @@ const Project = () => {
                 <div className="users flex flex-col gap-">
                     { project.users && project.users.map(user => {
                         return (
-                            <div className="user p-2 flex gap-2 items-center cursor-pointer hover:bg-slate-200">
+                            <div key={user._id} className="user p-2 flex gap-2 items-center cursor-pointer hover:bg-slate-200">
                                 <div
                                 className='aspect-square rounded-full w-fit h-fit p-5 text-white bg-slate-600 flex items-center justify-center'>
                                     <i className="ri-user-fill absolute"></i>

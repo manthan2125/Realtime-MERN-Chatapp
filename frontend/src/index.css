@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+
+/* This css is by default loaded whe n we use above import line  */
+/* * {
+  margin: 0%;
+  padding: 0%;
+  box-sizing: border-box;
+} */
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}

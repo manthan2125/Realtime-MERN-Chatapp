@@ -40,6 +40,7 @@ export const getAllProjectById = async ({userId}) => {
 
 export const addUsersToProject = async({ projectId, users, userId}) => {
     // userId uss user ki id hai jo try kar rha hai dusre user ko add krne kii
+    // userId is loggedIn user id    
     if(!projectId){
         throw new Error("projectId is required")
     }
@@ -63,7 +64,7 @@ export const addUsersToProject = async({ projectId, users, userId}) => {
 
     // It finds on basis of 2 things - 
     // 1. projectId
-    // 2. userId
+    // 2. users ke andar loggedin user ki userId haii
     const project = await projectModel.findOne({
         _id: projectId,
         users: userId
@@ -86,8 +87,6 @@ export const addUsersToProject = async({ projectId, users, userId}) => {
     });
 
     return updatedProject;
-
-
 }
 
 export const getProjectById = async({projectId}) => {

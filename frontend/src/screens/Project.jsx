@@ -17,6 +17,8 @@ const Project = () => {
     const [project, setProject] = useState(location.state.project)   // location.state.project -> will hold clicked project in on HOME page in the form of object 
     const [message, setMessage] = useState('')
     const { user } = useContext(UserContext);
+    const messageBox = React.createRef();
+
 
 
     const handleUserClick = (id) => {
@@ -50,8 +52,10 @@ const Project = () => {
     function send() {
         sendMessage("project-message", {
             message,
-            sender: user._id
+            sender: user
         })
+
+        appendOutgoingMessage(message);
 
         setMessage("");
     }
@@ -62,6 +66,7 @@ const Project = () => {
 
         receiveMessage("project-message", data => {
             console.log(data );
+            appendIncomingMessage(data);
         });
 
 
@@ -80,13 +85,45 @@ const Project = () => {
         })
     }, []);
 
+    function appendIncomingMessage(messageObject){
+
+        const messageBox = document.querySelector(".message-box");
+
+        const message = document.createElement("div")
+        message.classList.add("message", "max-w-56", "flex", "flex-col", "p-2","bg-slate-50","w-fit","rounded-md")
+        message.innerHTML = `
+                <small className='opacity-65 test-xs'>${messageObject.sender.email}</small>
+                <p className='text-sm'>${messageObject.message}</p>
+            `
+        messageBox.appendChild(message);
+        scrollToBottom()
+    } 
+    
+    function appendOutgoingMessage(message){
+
+        const messageBox = document.querySelector(".message-box");
+
+        const newMessage = document.createElement("div");
+        newMessage.classList.add("ml-auto", "message", "max-w-56","flex", "flex-col", "p-2", "bg-slate-50","w-fit", "rounded-md");
+        newMessage.innerHTML = `
+                    <small className='opacity-65 test-xs'>${user.email}</small>
+                    <p className='text-sm'>${message}</p>
+                `
+        messageBox.appendChild(newMessage);
+        scrollToBottom()
+    }
+
+    function scrollToBottom() {
+        messageBox.current.scrollTop = messageBox.current.scrollHeight
+    }
+
   return (
     <main
     className='h-screen w-screen flex'
     >
-        <section className='left h-full min-w-96 bg-slate-300 flex flex-col justify-between ' >
+        <section className='left h-screen min-w-96 bg-slate-300 flex flex-col relative' >
             <header
-            className='flex justify-between items-center p-2 px-4 w-full bg-slate-100'>
+            className='flex justify-between items-center p-2 px-4 min-w-96 bg-slate-100 absolute top-0 z-10'>
                 <button
                 onClick= {() =>  setIsModalOpen(true)}
                 className='flex gap-2 cursor-pointer'
@@ -103,23 +140,17 @@ const Project = () => {
                 </button>
             </header>
 
-            <div className="conversation-area flex flex-col grow p-1">
-                <div className="message-box flex flex-col grow gap-1">
-                    <div className="message max-w-56 flex flex-col p-2 bg-slate-50 w-fit rounded-md">
-                        <small className='opacity-65 test-xs'>example@gmail.com</small>
-                        <p className='text-sm'>Lorem ipsum dolor sit amet.</p>
-                    </div>
-                    <div className="message max-w-56 flex flex-col p-2 ml-auto bg-slate-50 w-fit rounded-md">
-                        <small className='opacity-65 test-xs'>example@gmail.com</small>
-                        <p className='text-sm'>Lorem ipsum dolor sit amet.</p>
-                    </div>
+            <div className="conversation-area flex flex-col grow p-2 pt-16 relative h-screen" >
+                <div 
+                ref={messageBox}
+                className="message-box flex flex-col grow gap-1 pb-2 overflow-auto max-h-full scrollbar-hide">
                 </div>
                 
-                <div className="input-field w-full flex bg-slate-100">
+                <div className="input-field w-full flex bg-slate-100 ">
                     <input
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className='p-2 px-4 border-none outline-none grow'
+                    className='p-2 px-4 border-none outline-none grow  min-w-0'
                     type="text" placeholder='Enter message' />
                     <button 
                     onClick={send}

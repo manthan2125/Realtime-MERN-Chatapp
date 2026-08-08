@@ -60,6 +60,25 @@ const Project = () => {
         setMessage("");
     }
 
+    function scrollToBottom() {
+        messageBox.current.scrollTop = messageBox.current.scrollHeight
+    }
+
+
+    function appendIncomingMessage(messageObject){
+
+        const messageBox = document.querySelector(".message-box");
+
+        const message = document.createElement("div")
+        message.classList.add("message", "max-w-56", "flex", "flex-col", "p-2","bg-slate-50","w-fit","rounded-md")
+        message.innerHTML = `
+                <small className='opacity-65 test-xs'>${messageObject.sender.email}</small>
+                <p className='text-sm'>${messageObject.message}</p>
+            `
+        messageBox.appendChild(message);
+        scrollToBottom()
+    } 
+
     useEffect(() => {
 
         initializeSocket(project._id);
@@ -85,19 +104,6 @@ const Project = () => {
         })
     }, []);
 
-    function appendIncomingMessage(messageObject){
-
-        const messageBox = document.querySelector(".message-box");
-
-        const message = document.createElement("div")
-        message.classList.add("message", "max-w-56", "flex", "flex-col", "p-2","bg-slate-50","w-fit","rounded-md")
-        message.innerHTML = `
-                <small className='opacity-65 test-xs'>${messageObject.sender.email}</small>
-                <p className='text-sm'>${messageObject.message}</p>
-            `
-        messageBox.appendChild(message);
-        scrollToBottom()
-    } 
     
     function appendOutgoingMessage(message){
 
@@ -113,10 +119,7 @@ const Project = () => {
         scrollToBottom()
     }
 
-    function scrollToBottom() {
-        messageBox.current.scrollTop = messageBox.current.scrollHeight
-    }
-
+    
   return (
     <main
     className='h-screen w-screen flex'

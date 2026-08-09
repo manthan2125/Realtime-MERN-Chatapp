@@ -15,8 +15,10 @@ const Project = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [ selectedUserId, setSelectedUserId ] = useState(new Set())  // A Set is a JavaScript object that stores unique values only.
     const [project, setProject] = useState(location.state.project)   // location.state.project -> will hold clicked project in on HOME page in the form of object 
+
     const [message, setMessage] = useState('')
     const { user } = useContext(UserContext);
+
     const messageBox = React.createRef();
     
     const [users, setUsers] = useState([])  // users array is an array of objects of all users except logged in user
@@ -67,8 +69,8 @@ const Project = () => {
 
     function send() {
         sendMessage("project-message", {
-            message,
-            sender: user
+            message,            // ye message wo msg hai jo input field m likhunga...
+            sender: user        // user jo currently logged in user hai whi hai...
         })
 
         setMessages(prevMessages => [ ...prevMessages, { sender: user, message } ]) // Update messages state
@@ -79,56 +81,57 @@ const Project = () => {
         messageBox.current.scrollTop = messageBox.current.scrollHeight
     }
 
-    // function appendIncomingMessage(messageObject){
+    
+    // function WriteAiMessage(message) {
 
-    //     const messageBox = document.querySelector(".message-box");
+    //     const messageObject = JSON.parse(message)
 
-    //     const message = document.createElement("div");
-    //     message.classList.add("message", "max-w-56", "flex", "flex-col", "p-2","bg-slate-50","w-fit","rounded-md");
-
-    //     if(messageObject.sender._id === "ai"){
-
-    //         const markdown = (<Markdown>{messageObject.message}</Markdown>)
-    //         message.innerHTML = `
-    //         <small className='opacity-65 test-xs'>${messageObject.sender.email}</small>
-    //         <p className='text-sm'>${markdown}</p>
-    //         `
-    //     } else{
-    //         message.innerHTML = `
-    //             <small className='opacity-65 test-xs'>${messageObject.sender.email}</small>
-    //             <p className='text-sm'>${messageObject.message}</p>
-    //         `
-    //     }
-    //     messageBox.appendChild(message);
-    //     scrollToBottom()
-    // } 
+    //     return (
+    //         <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
+    //             <Markdown
+    //                 children={messageObject.text}
+    //                 options={{
+    //                     overrides: {
+    //                         code: SyntaxHighlightedCode,
+    //                     },
+    //                 }}
+    //             />
+    //         </div>
+    //     )
+    // }
 
 
-    function WriteAiMessage(message) {
+    function WriteAiMessage(message) {        //  ye msg normal string to hai but it contians markdown syntax -> that we have to format
 
-        const messageObject = JSON.parse(message)
+    // console.log("AI message received in markdwon syntax :", message);
 
-        return (
-            <div
-                className='overflow-auto bg-slate-950 text-white rounded-sm p-2'
+    const messageObject = JSON.parse(message);
+
+    // console.log("Parsed AI message:", messageObject);
+    // console.log("Actual message:", messageObject.message);
+
+    return (
+        <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
+            <Markdown
+                options={{
+                    overrides: {
+                        code: SyntaxHighlightedCode,
+                    },
+                }}
             >
-                <Markdown
-                    children={messageObject.text}
-                    options={{
-                        overrides: {
-                            // code: SyntaxHighlightedCode,
-                        },
-                    }}
-                />
-            </div>
-        )
-    }
+                {messageObject.message}
+            </Markdown>
+        </div>
+    )
+}
+
+
 
     useEffect(() => {
 
         initializeSocket(project._id);
 
-        receiveMessage("project-message", data => {
+        receiveMessage("project-message", data => {              // data ek object hai jo message or sender hold krta hai(normal user or ai)
             setMessages(prevMessages => [ ...prevMessages, data])    // Update messages state
         });
 
@@ -149,20 +152,6 @@ const Project = () => {
     }, []);
 
     
-    // function appendOutgoingMessage(message){
-
-    //     const messageBox = document.querySelector(".message-box");
-
-    //     const newMessage = document.createElement("div");
-    //     newMessage.classList.add("ml-auto", "message", "max-w-56","flex", "flex-col", "p-2", "bg-slate-50","w-fit", "rounded-md");
-    //     newMessage.innerHTML = `
-    //                 <small className='opacity-65 test-xs'>${user.email}</small>
-    //                 <p className='text-sm'>${message}</p>
-    //             `
-    //     messageBox.appendChild(newMessage);
-    //     scrollToBottom()
-    // }
-
     
   return (
     <main
@@ -187,18 +176,37 @@ const Project = () => {
                 </button>
             </header>
 
+            {/* condition && value
+                If condition is true
+                    true && 'ml-auto'
+                    Result: 'ml-auto'
+                    So React receives: className="ml-auto"
+                If condition is false:
+                    React doesn't add anything for false.
+            */}
+
+            {/* Markdown is not a different data type. It is still a normal string. Markdown is a way of formatting/structuring that string. */}
+
+            {/* 
+                message → JSON STRING
+                messageObject → JAVASCRIPT OBJECT
+                messageObject.text → STRING containing Markdown syntax
+                <Markdown> → renders that Markdown
+                */}
+
             <div className="conversation-area flex flex-col grow p-2 pt-16 relative h-screen" >
                 <div 
                 ref={messageBox}
                 className="message-box flex flex-col grow gap-1 pb-2 overflow-auto max-h-full scrollbar-hide">
-                    {messages.map((msg, index) => (
-                            <div key={index} className={`${msg.sender._id === 'ai' ? 'max-w-80' : 'max-w-52'} ${msg.sender._id == user._id.toString() && 'ml-auto'}  message flex flex-col p-2 bg-slate-50 w-fit rounded-md`}>
+                    {messages.map((msg, index) => (      // ye msg -> ek object hai jiske andar email or _id hai...
+                            <div key={index} className={`message ${msg.sender._id === 'ai' ? 'max-w-80' : 'max-w-60'} ${msg.sender._id == user._id.toString() && 'ml-auto'} flex flex-col p-2 bg-slate-50 w-fit rounded-md`}>
                                 <small className='opacity-65 text-xs'>{msg.sender.email}</small>
                                 <div className='text-sm'>
                                     {msg.sender._id === 'ai' ? 
-                                    <div className='overflow-auto bg-slate-950 text-white p-2 rounded-sm'>
-                                        <Markdown>{msg.message}</Markdown> 
-                                    </div>
+                                    WriteAiMessage(msg.message)               // msg.message is a normal JavaScript string, but that string contains Markdown syntax.
+                                    // <div className='overflow-auto bg-slate-950 text-white p-2 rounded-sm'>
+                                    //     <Markdown>{msg.message}</Markdown> 
+                                    // </div>
                                     : <p>{msg.message}</p>}
                                 </div>
                             </div>

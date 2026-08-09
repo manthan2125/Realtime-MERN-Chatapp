@@ -11,7 +11,7 @@ const UserAuth = ({children}) => {
     const navigate = useNavigate()
 
 
-    useEffect(() => {
+    useEffect(() => { 
 
         if(user) {
             setLoading(false);

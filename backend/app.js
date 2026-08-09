@@ -2,7 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import userRoutes from "./src/routes/user.routes.js"
 import projectRoutes from "./src/routes/project.routes.js"
-import aiRoutes from "./src/routes/ai.router.js"
+import aiRoutes from "./src/routes/ai.routes.js"
 
 import cookieParser from "cookie-parser"; 
 import cors from "cors"

@@ -6,6 +6,22 @@ import { UserContext } from '../context/user.context.jsx';
 import Markdown from "markdown-to-jsx";
 
 
+function SyntaxHighlightedCode(props) {
+        const ref = useRef(null)
+
+        React.useEffect(() => {
+            if (ref.current && props.className?.includes('lang-') && window.hljs) {
+                window.hljs.highlightElement(ref.current)
+
+                // hljs won't reprocess the element unless this attribute is removed
+                ref.current.removeAttribute('data-highlighted')
+            }
+        }, [ props.className, props.children ])
+
+        return <code {...props} ref={ref} />
+    }
+
+
 const Project = () => {
 
     const location = useLocation();
@@ -23,22 +39,6 @@ const Project = () => {
     
     const [users, setUsers] = useState([])  // users array is an array of objects of all users except logged in user
     const [messages, setMessages] = useState([])
-
-    
-    function SyntaxHighlightedCode(props) {
-        const ref = useRef(null)
-
-        React.useEffect(() => {
-            if (ref.current && props.className?.includes('lang-') && window.hljs) {
-                window.hljs.highlightElement(ref.current)
-
-                // hljs won't reprocess the element unless this attribute is removed
-                ref.current.removeAttribute('data-highlighted')
-            }
-        }, [ props.className, props.children ])
-
-        return <code {...props} ref={ref} />
-    }
 
 
     const handleUserClick = (id) => {
@@ -108,7 +108,7 @@ const Project = () => {
     const messageObject = JSON.parse(message);
 
     // console.log("Parsed AI message:", messageObject);
-    // console.log("Actual message:", messageObject.message);
+    console.log("Actual message:", messageObject.text);
 
     return (
         <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
@@ -119,7 +119,7 @@ const Project = () => {
                     },
                 }}
             >
-                {messageObject.message}
+                {messageObject.text}
             </Markdown>
         </div>
     )

@@ -4,6 +4,7 @@ import axios from "../config/axios.js"
 import { initializeSocket, receiveMessage, sendMessage } from "../config/socket.js"
 import { UserContext } from '../context/user.context.jsx';
 import Markdown from "markdown-to-jsx";
+import hljs from 'highlight.js'
 
 
 function SyntaxHighlightedCode(props) {
@@ -27,18 +28,21 @@ const Project = () => {
     const location = useLocation();
     // console.log(location.state);
 
-    const [isSidePanelOpen, setIsSidePanelOpen] = useState(false)
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [ selectedUserId, setSelectedUserId ] = useState(new Set())  // A Set is a JavaScript object that stores unique values only.
-    const [project, setProject] = useState(location.state.project)   // location.state.project -> will hold clicked project in on HOME page in the form of object 
+    const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [ selectedUserId, setSelectedUserId ] = useState(new Set()); // A Set is a JavaScript object that stores unique values only.
+    const [project, setProject] = useState(location.state.project);   // location.state.project -> will hold clicked project in on HOME page in the form of object 
 
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState('');
     const { user } = useContext(UserContext);
 
     const messageBox = React.createRef();
     
-    const [users, setUsers] = useState([])  // users array is an array of objects of all users except logged in user
-    const [messages, setMessages] = useState([])
+    const [users, setUsers] = useState([]);  // users array is an array of objects of all users except logged in user
+    const [messages, setMessages] = useState([]);
+    const [fileTree, setFileTree] = useState({});
+    const [currentFile, setCurrentFile] = useState(null);
+    const [openFiles, setOpenFiles] = useState([])
 
 
     const handleUserClick = (id) => {
@@ -81,34 +85,18 @@ const Project = () => {
         messageBox.current.scrollTop = messageBox.current.scrollHeight
     }
 
-    
-    // function WriteAiMessage(message) {
-
-    //     const messageObject = JSON.parse(message)
-
-    //     return (
-    //         <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
-    //             <Markdown
-    //                 children={messageObject.text}
-    //                 options={{
-    //                     overrides: {
-    //                         code: SyntaxHighlightedCode,
-    //                     },
-    //                 }}
-    //             />
-    //         </div>
-    //     )
-    // }
-
 
     function WriteAiMessage(message) {        //  ye msg normal string to hai but it contians markdown syntax -> that we have to format
 
     // console.log("AI message received in markdwon syntax :", message);
 
+    // console.log("Problematic string:", message);
+    // console.log("Character at 1398:", message[1398]);
+
     const messageObject = JSON.parse(message);
 
     // console.log("Parsed AI message:", messageObject);
-    console.log("Actual message:", messageObject.text);
+    // console.log("Actual message:", messageObject.text);
 
     return (
         <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
@@ -118,7 +106,7 @@ const Project = () => {
                         code: SyntaxHighlightedCode,
                     },
                 }}
-            >
+            >   
                 {messageObject.text}
             </Markdown>
         </div>
@@ -132,6 +120,12 @@ const Project = () => {
         initializeSocket(project._id);
 
         receiveMessage("project-message", data => {              // data ek object hai jo message or sender hold krta hai(normal user or ai)
+            console.log(JSON.parse(data.message));
+            const message = JSON.parse(data.message);
+            if(message.fileTree){
+                setFileTree(message.fileTree);
+            }
+            
             setMessages(prevMessages => [ ...prevMessages, data])    // Update messages state
         });
 
@@ -154,9 +148,7 @@ const Project = () => {
     
     
   return (
-    <main
-    className='h-screen w-screen flex'
-    >
+    <main className='h-screen w-screen flex'>
         <section className='left h-screen min-w-96 bg-slate-300 flex flex-col relative' >
             <header
             className='flex justify-between items-center p-2 px-4 min-w-96 bg-slate-100 absolute top-0 z-10'>
@@ -251,6 +243,109 @@ const Project = () => {
                 </div>
             </div>
 
+        </section>
+
+        <section className="right bg-amber-100 grow h-full flex">
+            <div className="explorer h-full max-w-64 min-w-52 bg-slate-200">
+                <div className="file-tree w-full">
+                    {
+                        Object.keys(fileTree).map((file, index) => (
+                            <button 
+                            onClick={() => {
+                                setCurrentFile(file);
+                                setOpenFiles([ ... new Set([ ...openFiles, file]) ]);
+                            }}
+                            className="tree-element p-2 px-4 flex items-center gap-2 bg-slate-300 w-full cursor-pointer ">
+                                <p className='text-lg '>{file}</p>
+                            </button>
+                        ))
+                    }
+                </div>
+            </div>
+
+            {/* {
+                currentFile && (
+                    <div className="code-editor-header flex justify-between items-center p-2 bg-slate-200">
+                        <h1 className="font-semibold text-lg"> {currentFile} </h1>
+                        <button className='p-2'  onClick={() => setCurrentFile(null)}>
+                            <i className='ri-close-fill'></i>
+                        </button>
+                    </div>
+                )
+            } */}
+
+            {currentFile && (
+            <div className="code-editor flex flex-col grow h-full">
+
+                <div className="top flex">
+                    {
+                        openFiles.map((file, index) => (
+                            <button 
+                            key={index}
+                            onClick={() => setCurrentFile(file)}
+                            className= {`open-file cursor-pointer p-2  px-4 flex ite ms-center w-fit gap-2 bg-slate-300 ${currentFile === file ? 'bg-slate-400' : ''}`}>
+                            <p
+                                className='font-semibold text-lg'
+                                >{file}
+                            </p>
+                            </button>
+                        ) )
+                    }
+                </div>
+                <div className="bottom flex grow h-full">
+                    {/* {
+                        fileTree[currentFile] && (
+                            <textarea
+                            value={fileTree[currentFile].file?.contents}
+                            onChange={(e) => {
+                                setFileTree({
+                                    ...fileTree,
+                                    [currentFile]: {
+                                        content: e.target.value
+                                    }
+                                })  
+                            }}
+                            className='w-full h-full p-4 bg-slate-50 border-none outline-none'></textarea>
+                        )
+                    } */}
+
+                    {
+                            fileTree[ currentFile ] && (
+                                <div className="code-editor-area h-full overflow-auto grow bg-slate-50">
+                                    <pre
+                                        className="hljs h-full">
+                                        <code
+                                            className="hljs h-full outline-none"
+                                            contentEditable
+                                            suppressContentEditableWarning
+                                            onBlur={(e) => {
+                                                const updatedContent = e.target.innerText;
+                                                const ft = {
+                                                    ...fileTree,
+                                                    [ currentFile ]: {
+                                                        file: {
+                                                            contents: updatedContent
+                                                        }
+                                                    }
+                                                }
+                                                // setFileTree(ft)
+                                                // saveFileTree(ft)
+                                            }}
+                                            dangerouslySetInnerHTML={{ __html: hljs.highlight('javascript', fileTree[ currentFile ].file.contents).value }}
+                                            style={{
+                                                whiteSpace: 'pre-wrap',
+                                                paddingBottom: '25rem',
+                                                counterSet: 'line-numbering',
+                                            }}
+                                        />
+                                    </pre>
+                                </div>
+                            )
+                        }
+                </div>
+
+            </div>
+            )}
         </section>
         
 

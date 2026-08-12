@@ -4,7 +4,8 @@ import axios from "../config/axios.js"
 import { initializeSocket, receiveMessage, sendMessage } from "../config/socket.js"
 import { UserContext } from '../context/user.context.jsx';
 import Markdown from "markdown-to-jsx";
-import hljs from 'highlight.js'
+import hljs from 'highlight.js';
+import { getWebContainer } from "../config/webContainer.js";
 
 
 function SyntaxHighlightedCode(props) {
@@ -42,7 +43,10 @@ const Project = () => {
     const [messages, setMessages] = useState([]);
     const [fileTree, setFileTree] = useState({});
     const [currentFile, setCurrentFile] = useState(null);
-    const [openFiles, setOpenFiles] = useState([])
+    const [openFiles, setOpenFiles] = useState([]);
+    const [webContainer, setWebContainer] = useState(null);
+
+
 
 
     const handleUserClick = (id) => {
@@ -119,9 +123,23 @@ const Project = () => {
 
         initializeSocket(project._id);
 
+        if(!webContainer){
+            getWebContainer().then(container => {   // webContainer start kar diya
+                setWebContainer(container);
+                console.log("container started");
+                
+            })
+        }
+
+
         receiveMessage("project-message", data => {              // data ek object hai jo message or sender hold krta hai(normal user or ai)
             console.log(JSON.parse(data.message));
             const message = JSON.parse(data.message);
+
+            webContainer?.mount(message.fileTree);
+
+
+
             if(message.fileTree){
                 setFileTree(message.fileTree);
             }
@@ -245,7 +263,7 @@ const Project = () => {
 
         </section>
 
-        <section className="right bg-amber-100 grow h-full flex">
+        <section className="right bg-slate-100 grow h-full flex">
             <div className="explorer h-full max-w-64 min-w-52 bg-slate-200">
                 <div className="file-tree w-full">
                     {
@@ -263,19 +281,8 @@ const Project = () => {
                 </div>
             </div>
 
-            {/* {
-                currentFile && (
-                    <div className="code-editor-header flex justify-between items-center p-2 bg-slate-200">
-                        <h1 className="font-semibold text-lg"> {currentFile} </h1>
-                        <button className='p-2'  onClick={() => setCurrentFile(null)}>
-                            <i className='ri-close-fill'></i>
-                        </button>
-                    </div>
-                )
-            } */}
-
             {currentFile && (
-            <div className="code-editor flex flex-col grow h-full">
+            <div className="code-editor flex flex-col grow h-full p-3 gap-2">
 
                 <div className="top flex">
                     {
@@ -313,10 +320,11 @@ const Project = () => {
                             fileTree[ currentFile ] && (
                                 <div className="code-editor-area h-full overflow-auto grow bg-slate-50">
                                     <pre
-                                        className="hljs h-full">
+                                        className="hljs h-full ">
                                         <code
-                                            className="hljs h-full outline-none"
+                                            className="hljs h-full outline-none "
                                             contentEditable
+                                            spellCheck={false}
                                             suppressContentEditableWarning
                                             onBlur={(e) => {
                                                 const updatedContent = e.target.innerText;

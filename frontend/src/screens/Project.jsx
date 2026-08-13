@@ -46,7 +46,8 @@ const Project = () => {
   const [currentFile, setCurrentFile] = useState(null);
   const [openFiles, setOpenFiles] = useState([]);
   const [webContainer, setWebContainer] = useState(null);
-  const [iframeUrl, setIframeUrl] = useState(null)
+  const [iframeUrl, setIframeUrl] = useState(null);
+  const [runProcess, setRunProcess] = useState(null);
 
 
   const handleUserClick = (id) => {
@@ -351,14 +352,19 @@ const Project = () => {
                         return;
                     }
 
+                    if(runProcess){
+                        runProcess.kill();
+                    }
                     // 5. Start the server
-                    const runProcess = await webContainer?.spawn("npm", ["start"]);
+                    let tempRunProcess = await webContainer?.spawn("npm", ["start"]);
                     // 6. Read server output
-                    runProcess.output.pipeTo(new WritableStream({
+                    tempRunProcess.output.pipeTo(new WritableStream({
                         write(chunk){
                             console.log(chunk);
                         }
                     }));
+
+                    setRunProcess(tempRunProcess);
 
                     webContainer.on("server-ready", (port, url) => {
                         console.log(port, url); 
@@ -391,7 +397,7 @@ const Project = () => {
                           },
                         },
                       };
-                      // setFileTree(ft)
+                      setFileTree(ft)
                       // saveFileTree(ft)
                     }}
                     dangerouslySetInnerHTML={{
@@ -413,7 +419,15 @@ const Project = () => {
         </div>
 
         {iframeUrl && webContainer && 
-            <iframe src={iframeUrl} className="w-1/2 h-full" ></iframe> 
+            (<div className="flex flex-col h-full min-w-96">
+                <div className="address-bar">
+                    <input type="text"
+                    onChange={(e) => {setIframeUrl(e.target.value)}}
+                    value={iframeUrl}
+                    className="w-full p-2 px-4 bg-slate-500" />
+                </div>
+                <iframe src={iframeUrl} className="w-full h-full" ></iframe> 
+            </div>)
         }
 
 

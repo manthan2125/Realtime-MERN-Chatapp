@@ -109,16 +109,38 @@ Use this structure:
         }
     },
     "routes": {
-        "health.routes.js": {
-            "file": {
-                "contents": "actual source code"
+        directory: {
+            "health.routes.js": {
+                file: {
+                    contents: "..."
+                }
             }
         }
     },
     "controllers": {
-        "health.controller.js": {
-            "file": {
-                "contents": "actual source code"
+        directory: {
+            "health.controller.js": {
+                file: {
+                    contents: "..."
+                }
+            }
+        }
+    },
+    "middlewares": {
+        directory: {
+            "error.middleware.js": {
+                file: {
+                    contents: "..."
+                }
+            }
+        }
+    },
+    "utils": {
+        directory: {
+            "logger.js": {
+                file: {
+                    contents: "..."
+                }
             }
         }
     },
@@ -131,7 +153,12 @@ Use this structure:
         "file": {
             "contents": "actual environment variables"
         }
+    },
+    "README.md": {
+    "file": {
+        "contents": "actual README.md content"
     }
+}
 }
 
 Do NOT use ambiguous file names such as:
@@ -280,3 +307,6 @@ Only return the response after these checks pass.
 // console.log(response.text);
 return response.text;            //response.text -> contains the generated text as a string.
 }
+
+
+// @ai create an express server with es6 features like importjust create 2 files app.js and package.json file and add / route in app.js file that prints Hello from express on ui

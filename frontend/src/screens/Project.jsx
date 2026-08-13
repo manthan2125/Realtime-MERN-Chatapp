@@ -142,6 +142,7 @@ const Project = () => {
 
       if (message.fileTree) {
         setFileTree(message.fileTree);
+        saveFileTree(message.fileTree);
       }
 
       setMessages((prevMessages) => [...prevMessages, data]); // Update messages state
@@ -152,6 +153,7 @@ const Project = () => {
       .then((res) => {
         // console.log("project with usser data", res.data.project);    // this will get that specific project with populated user
         setProject(res.data.project);
+        setFileTree(res.data.project.fileTree)
       });
 
     //  iss res.data.users ke andar wo sare user honge except logged in user
@@ -164,6 +166,17 @@ const Project = () => {
         console.log(err);
       });
   }, []);
+
+  function saveFileTree(ft) {
+    axios.put("/projects/update-file-tree", {
+        projectId: project._id,
+        fileTree:ft
+    }).then(res => {
+        console.log(res.data);
+    }).catch(err => {
+        console.log(err);
+    }) 
+  }
 
   return (
     <main className="h-screen w-screen flex overflow-hidden">
@@ -398,7 +411,7 @@ const Project = () => {
                         },
                       };
                       setFileTree(ft)
-                      // saveFileTree(ft)
+                      saveFileTree(ft)
                     }}
                     dangerouslySetInnerHTML={{
                       __html: hljs.highlight(

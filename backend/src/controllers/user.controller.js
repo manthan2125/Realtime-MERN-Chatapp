@@ -5,16 +5,17 @@ import redisClient from "../services/redis.service.js";
 
 
 
+
 export const createUserController = async(req, res) => {
     // It returns an object containing the validation results.
     const errors = validationResult(req);
-
     if(!errors.isEmpty()){
         return res.status(400).json({ errors: errors.array()});
     }
 
     try{
-        const user = await userService.createUser(req.body);
+        const { email, password } = req.body;
+        const user = await userService.createUser({email, password});
 
         const token = await user.generateJWT();
         delete user._doc.password;

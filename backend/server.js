@@ -15,6 +15,7 @@ connectToDB()
 
 const port = process.env.PORT || 3000;
 
+// Useful when you need the server object separately
 const server = http.createServer(app);
 
 const io = new Server(server, {

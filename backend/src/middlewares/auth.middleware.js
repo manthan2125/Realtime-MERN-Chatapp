@@ -12,8 +12,15 @@ export const authUser = async (req, res, next) => {
         }
 
         // if token exists in redis  -> then -> await redisClient.get(token) -> will return "logout"(value stored in redis) else null
+        // First, remember that Redis stores data as key-value pairs.
+        // Key	   ---      Value
+        // abc123  ---  	"logout" 
+        // If that token exists in redis it returns logout else null   
+        
+        // redisClient.get() is asynchronous
         const isTokenBlacklisted = await redisClient.get(token);
 
+        // Agar redis mein wo token hoga (blacklisted token) to seedha retrun unauthorisez user ho jaega
         if(isTokenBlacklisted){
             res.clearCookie("token");
             return res.status(401).send({ error: "Unauthorized user"}) 

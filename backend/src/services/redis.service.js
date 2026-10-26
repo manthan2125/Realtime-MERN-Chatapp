@@ -8,6 +8,11 @@ redisClient.on("connect", () => {
     console.log("✅ Redis Connected");
 });
 
+redisClient.on("error", (err) => {
+    console.error("Redis Client Error:", err.message);
+});
+
+// IIFE
 (async () => {
     try {
         await redisClient.connect();

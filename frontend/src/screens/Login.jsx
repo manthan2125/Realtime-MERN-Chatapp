@@ -25,8 +25,9 @@ const Login = () => {
 
             localStorage.setItem('token', res.data.token)
             setUser(res.data.user)
-
+            
             navigate('/')
+
         }).catch((err) => {
             console.log(err.response.data) 
         })
@@ -61,7 +62,7 @@ const Login = () => {
                     </div>
                     <button
                         type="submit"
-                        className="w-full p-3 rounded bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full p-3 rounded bg-blue-500 text-white hover:bg-blue-600 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                         Login
                     </button>

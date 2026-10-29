@@ -37,6 +37,7 @@ export const getAllProjects = async (req, res) => {
             userId: loggedInUser._id
         })
 
+        // This is returning array of objectss to frontend
         return res.status(200).json({
             projects: allUserProjects
         })

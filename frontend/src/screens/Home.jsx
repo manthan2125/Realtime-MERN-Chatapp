@@ -45,7 +45,7 @@ const Home = () => {
       <div className="projects flex flex-wrap gap-3">
         <button 
         onClick={() => { setIsModalOpen(true) }}
-        className="project p-4 border border-slate-300 rounded-md">
+        className="project p-4 border border-slate-300 rounded-md cursor-pointer">
           New Project
           <i className="ri-links-line ml-2"></i>
         </button>
@@ -92,8 +92,8 @@ const Home = () => {
                                     type="text" className="mt-1 block w-full p-2 border border-gray-300 rounded-md" required />
                             </div>
                             <div className="flex justify-end">
-                                <button type="button" className="mr-2 px-4 py-2 bg-gray-300 rounded-md" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md">Create</button>
+                                <button type="button" className="mr-2 px-4 py-2 bg-gray-300 rounded-md cursor-pointer active:scale-95 hover:bg-gray-200" onClick={() => setIsModalOpen(false)}>Cancel</button>
+                                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md cursor-pointer active:scale-95 hover:bg-blue-500">Create</button>
                             </div>
                         </form>
                     </div>

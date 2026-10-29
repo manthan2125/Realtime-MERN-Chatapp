@@ -11,6 +11,7 @@ const UserAuth = ({children}) => {
     const navigate = useNavigate()
 
 
+    
     useEffect(() => { 
 
         if(user) {

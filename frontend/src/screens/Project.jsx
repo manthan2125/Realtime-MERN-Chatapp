@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "../config/axios.js";
-import {
-  initializeSocket,
-  receiveMessage,
-  sendMessage,
-} from "../config/socket.js";
+import { initializeSocket, receiveMessage, sendMessage } from "../config/socket.js";
 import { UserContext } from "../context/user.context.jsx";
 import Markdown from "markdown-to-jsx";
 import hljs from "highlight.js";
@@ -134,9 +130,16 @@ const Project = () => {
 
     receiveMessage("project-message", (data) => {
       // data ek object hai jo message or sender hold krta hai(normal user or ai)
-    //   console.log(data);
-      console.log(JSON.parse(data.message));
-      const message = JSON.parse(data.message);
+      //   console.log(data);
+      // console.log(JSON.parse(data.message));
+      // const message = JSON.parse(data.message);
+      let message;
+
+      try {
+        message = JSON.parse(data.message);
+      } catch (error) {
+        message = { text: data.message };
+      }
 
       webContainer?.mount(message.fileTree);
 
@@ -302,6 +305,8 @@ const Project = () => {
           <div className="file-tree w-full">
             {Object.keys(fileTree).map((file, index) => (
               <button
+                key={file}
+
                 onClick={() => {
                   setCurrentFile(file);
                   setOpenFiles([...new Set([...openFiles, file])]);

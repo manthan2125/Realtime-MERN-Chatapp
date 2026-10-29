@@ -15,8 +15,7 @@ connectToDB()
 
 const port = process.env.PORT || 3000;
 
-// Useful when you need the server object separately
-const server = http.createServer(app);
+const server = http.createServer(app); // Useful when you need the server object separately
 
 const io = new Server(server, {
     cors: {
@@ -70,7 +69,7 @@ io.on('connection', socket => {
     socket.join(socket.roomId);
 
     socket.on("project-message", async (data) => {    // frontend pe : send( message, sender: user)
-        // console.log(data)
+        console.log(data)
 
         const message = data.message;
         // console.log("messsaageee",data)      // data ek object hai jiske andar message or sender naam ki field haii

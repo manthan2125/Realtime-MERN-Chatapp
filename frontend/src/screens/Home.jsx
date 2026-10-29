@@ -45,7 +45,7 @@ const Home = () => {
       <div className="projects flex flex-wrap gap-3">
         <button 
         onClick={() => { setIsModalOpen(true) }}
-        className="project p-4 border border-slate-300 rounded-md cursor-pointer">
+        className="project p-4 border border-slate-300 rounded-md cursor-pointer hover:bg-slate-200 active:scale-95">
           New Project
           <i className="ri-links-line ml-2"></i>
         </button>

@@ -207,7 +207,7 @@ const Project = () => {
                     So React receives: className="ml-auto"
                 If condition is false:
                     React doesn't add anything for false.
-            */}
+        */}
 
         {/* Markdown is not a different data type. It is still a normal string. Markdown is a way of formatting/structuring that string. */}
 
@@ -216,7 +216,7 @@ const Project = () => {
                 messageObject → JAVASCRIPT OBJECT
                 messageObject.text → STRING containing Markdown syntax
                 <Markdown> → renders that Markdown
-                */}
+        */}
 
         <div className="conversation-area flex flex-col grow p-2 pt-16 relative h-screen">
           <div
@@ -267,9 +267,7 @@ const Project = () => {
           </div>
         </div>
 
-        <div
-          className={`sidePanel flex flex-col gap-2 min-w-96 h-full bg-slate-50 absolute transition-all ${isSidePanelOpen ? "translate-x-0" : "-translate-x-full"} top-0`}
-        >
+        <div className={`sidePanel flex flex-col gap-2 min-w-96 h-full bg-slate-400 absolute transition-all ${isSidePanelOpen ? "translate-x-0" : "-translate-x-full"} top-0`}>
           <header className="flex justify-between items-center px-4 p-2 bg-slate-300">
             <h1 className="font-semibold text-lg">Collaborators</h1>
             <button
@@ -451,7 +449,7 @@ const Project = () => {
           <div className="bg-white p-4 rounded-md w-96 max-w-full relative">
             <header className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Select User</h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2">
+              <button onClick={() => setIsModalOpen(false)} className="p-2 cursor-pointer hover:scale-x-90">
                 <i className="ri-close-fill"></i>
               </button>
             </header>
@@ -477,7 +475,7 @@ const Project = () => {
 
             <button
               onClick={addCollaborators}
-              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-blue-600 text-white rounded-md"
+              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer hover:bg-blue-700"
             >
               Add Collaborators
             </button>
